@@ -21,10 +21,38 @@
   localStorage.setItem('party_paco_user_id', state.user.id);
 
   // Inizializzazione Event Listeners DOM
-  document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', async () => {
+    await populateGameOptions();
     initDOMListeners();
     initSocketListeners();
   });
+
+  async function populateGameOptions() {
+    const select = document.getElementById('select-game-input');
+    if (!select) return;
+
+    try {
+      const res = await fetch('/api/games');
+      if (!res.ok) throw new Error('Impossibile caricare i giochi disponibili.');
+
+      const games = await res.json();
+      if (!Array.isArray(games) || games.length === 0) {
+        select.innerHTML = '<option value="non-ho-mai">🍷 Non Ho Mai</option>';
+        return;
+      }
+
+      select.innerHTML = games
+        .map(game => `<option value="${game.id}">${game.name}</option>`)
+        .join('');
+
+      if (!select.value) {
+        select.selectedIndex = 0;
+      }
+    } catch (err) {
+      console.error('[GameList] Errore caricamento giochi:', err.message);
+      select.innerHTML = '<option value="non-ho-mai">🍷 Non Ho Mai</option>';
+    }
+  }
 
   function initDOMListeners() {
     // Input nomi default

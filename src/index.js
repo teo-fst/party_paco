@@ -20,9 +20,11 @@ const telegramBot = require('./bot/telegramBot');
 // 1. REGISTRAZIONE MODULI GIOCO (Plug-and-Play)
 const nonHoMaiGame = require('./games/non-ho-mai');
 const impostoreGame = require('./games/impostore');
+const obbligoOVeritaGame = require('./games/obbligo-o-verita');
 
 gameRegistry.registerGame(nonHoMaiGame);
 gameRegistry.registerGame(impostoreGame);
+gameRegistry.registerGame(obbligoOVeritaGame);
 
 // 2. INIZIALIZZAZIONE EXPRESS & HTTP SERVER
 const app = express();
