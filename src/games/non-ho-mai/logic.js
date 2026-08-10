@@ -24,7 +24,12 @@ class NonHoMaiLogic {
       usedPhraseIds: [],
       roundNumber: 0,
       voting: null,
-      playerStats: {} // Map { playerId: { doneCount: 0, neverCount: 0 } }
+      playerStats: {},
+      customPhrases: {
+        classic: [],
+        party: [],
+        spicy: []
+      }
     };
   }
 
@@ -44,6 +49,39 @@ class NonHoMaiLogic {
         break;
       }
 
+      case 'SUBMIT_PHRASE': {
+        const phraseText = String(payload.text || '').trim();
+        const category = String(payload.category || updatedState.selectedCategory || 'classic').trim();
+
+        if (!phraseText) {
+          throw new Error('La frase proposta non può essere vuota.');
+        }
+
+        if (phraseText.length < 4) {
+          throw new Error('La frase proposta è troppo breve.');
+        }
+
+        if (!updatedState.customPhrases) {
+          updatedState.customPhrases = { classic: [], party: [], spicy: [] };
+        }
+
+        if (!updatedState.customPhrases[category]) {
+          updatedState.customPhrases[category] = [];
+        }
+
+        const phraseItem = {
+          id: `custom_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+          text: phraseText,
+          category,
+          createdBy: player.id,
+          createdAt: Date.now()
+        };
+
+        updatedState.customPhrases[category].push(phraseItem);
+        events.push({ type: 'CUSTOM_PHRASE_SUBMITTED', phrase: phraseItem });
+        break;
+      }
+
       case 'START_GAME':
       case 'NEXT_ROUND': {
         if (session.status !== 'PLAYING') {
@@ -51,11 +89,14 @@ class NonHoMaiLogic {
         }
 
         const category = payload.category || updatedState.selectedCategory || 'classic';
-        const phraseItem = contentPoolManager.drawRandomItem(
-          'non-ho-mai',
-          category,
-          updatedState.usedPhraseIds
-        );
+        const customPool = updatedState.customPhrases?.[category] || [];
+        const allPoolItems = [
+          ...contentPoolManager.pools.get('non-ho-mai')?.get(category) || [],
+          ...customPool
+        ];
+
+        const available = allPoolItems.filter(item => !updatedState.usedPhraseIds.includes(item.id));
+        const phraseItem = available[Math.floor(Math.random() * available.length)] || null;
 
         if (!phraseItem) {
           throw new Error("Tutte le frasi della categoria selezionata sono state completate!");

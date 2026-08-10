@@ -3,7 +3,7 @@
  * Application Controller Client - Socket.io & REST API Client per Party Paco.
  */
 
-(function() {
+(function () {
   const UI = window.PartyPacoUI;
   const socket = io();
 
@@ -98,13 +98,41 @@
       });
     });
 
-    // 4. AVVIO PARTITA DALLA LOBBY
+    // 4. AGGIUNTA FRASE PERSONALIZZATA
+    document.getElementById('btn-submit-phrase').addEventListener('click', async () => {
+      if (!state.currentRoomCode) return;
+
+      const text = document.getElementById('custom-phrase-input').value.trim();
+      if (!text) return alert('Inserisci una frase da proporre.');
+
+      try {
+        const res = await fetch(`/api/rooms/${state.currentRoomCode}/action`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            playerId: state.user.id,
+            action: 'SUBMIT_PHRASE',
+            payload: { category: state.selectedCategory, text }
+          })
+        });
+
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Errore durante l\'inserimento della frase.');
+
+        document.getElementById('custom-phrase-input').value = '';
+        alert('Frase aggiunta alla pool del gioco!');
+      } catch (err) {
+        alert(err.message);
+      }
+    });
+
+    // 5. AVVIO PARTITA DALLA LOBBY
     document.getElementById('btn-start-game').addEventListener('click', () => {
       if (!state.currentRoomCode) return;
       dispatchAction('START_GAME', { category: state.selectedCategory });
     });
 
-    // 5. VOTI NON HO MAI
+    // 6. VOTI NON HO MAI
     document.getElementById('btn-vote-done').addEventListener('click', () => {
       dispatchAction('VOTE', { vote: 'DONE' });
     });
@@ -113,12 +141,12 @@
       dispatchAction('VOTE', { vote: 'NEVER' });
     });
 
-    // 6. PROSSIMO TURNO / FRASE
+    // 7. PROSSIMO TURNO / FRASE
     document.getElementById('btn-next-round').addEventListener('click', () => {
       dispatchAction('NEXT_ROUND', { category: state.selectedCategory });
     });
 
-    // 7. PULSANTI ESCI STANZA
+    // 8. PULSANTI ESCI STANZA
     const leaveButtons = [
       document.getElementById('btn-leave-room-header'),
       document.getElementById('btn-leave-room-lobby'),

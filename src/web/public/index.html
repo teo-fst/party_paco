@@ -1,22 +1,27 @@
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Party Paco - Multi-Game Application Center</title>
-  <meta name="description" content="Framework generico e scalabile per giochi di gruppo, frasi e votazioni in tempo reale.">
-  
+  <meta name="description"
+    content="Framework generico e scalabile per giochi di gruppo, frasi e votazioni in tempo reale.">
+
   <!-- Google Fonts: Outfit & Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
-  
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+    rel="stylesheet">
+
   <!-- CSS Design System -->
   <link rel="stylesheet" href="/css/style.css">
-  
+
   <!-- Socket.io Client -->
   <script src="/socket.io/socket.io.js"></script>
 </head>
+
 <body>
   <div class="app-background">
     <div class="glow-orb orb-1"></div>
@@ -39,7 +44,7 @@
 
     <!-- Main Content Container -->
     <main id="main-content">
-      
+
       <!-- SCREEN 1: WELCOME / HOME -->
       <section id="screen-home" class="screen active">
         <div class="hero-card glass-panel">
@@ -88,7 +93,8 @@
           <div class="lobby-header">
             <span class="game-tag" id="lobby-game-title">Non Ho Mai</span>
             <h2>Lobby della Stanza</h2>
-            <p class="lobby-subtitle">Condividi il codice <strong><span id="lobby-code-text">------</span></strong> con i tuoi amici</p>
+            <p class="lobby-subtitle">Condividi il codice <strong><span id="lobby-code-text">------</span></strong> con
+              i tuoi amici</p>
           </div>
 
           <!-- Selezione Categoria -->
@@ -99,6 +105,16 @@
               <button class="pill" data-category="party">🥳 Party</button>
               <button class="pill" data-category="spicy">🔥 Spicy</button>
             </div>
+          </div>
+
+          <div class="category-section">
+            <h3>Proponi una frase ai giocatori</h3>
+            <div class="form-group">
+              <label for="custom-phrase-input">Inserisci una frase da aggiungere alla pool</label>
+              <input type="text" id="custom-phrase-input" placeholder="Es. Ho rubato il caffè al mio capo"
+                maxlength="140">
+            </div>
+            <button id="btn-submit-phrase" class="btn btn-secondary btn-block">➕ Aggiungi Frase</button>
           </div>
 
           <!-- Elenco Giocatori Connessi -->
@@ -167,20 +183,22 @@
             <button id="btn-leave-room-gameplay" class="btn btn-danger">🚪 Esci Stanza</button>
           </div>
         </div>
-      </section> </div>
-        </div>
       </section>
+  </div>
+  </div>
+  </section>
 
-    </main>
+  </main>
 
-    <!-- Footer -->
-    <footer class="app-footer">
-      <p>Party Paco Multi-Game Center • Powered by Node.js, Express & Socket.io</p>
-    </footer>
+  <!-- Footer -->
+  <footer class="app-footer">
+    <p>Party Paco Multi-Game Center • Powered by Node.js, Express & Socket.io</p>
+  </footer>
   </div>
 
   <!-- Client JS Application Scripts -->
   <script src="/js/ui.js"></script>
   <script src="/js/app.js"></script>
 </body>
+
 </html>
