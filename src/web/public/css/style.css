@@ -307,6 +307,37 @@ input[type="text"]:focus, select:focus {
   background: rgba(255, 255, 255, 0.05);
 }
 
+.btn-danger {
+  background: rgba(239, 68, 68, 0.2);
+  border: 1px solid #ef4444;
+  color: #fca5a5;
+}
+
+.btn-danger:hover {
+  background: #ef4444;
+  color: #fff;
+}
+
+.btn-leave-icon {
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  margin-left: 6px;
+  padding: 2px;
+  transition: transform var(--transition-fast);
+}
+
+.btn-leave-icon:hover {
+  transform: scale(1.2);
+}
+
+.action-footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 12px;
+}
+
 /* Category Pills */
 .category-section {
   margin-bottom: 25px;

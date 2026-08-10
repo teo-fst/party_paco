@@ -117,6 +117,19 @@
     document.getElementById('btn-next-round').addEventListener('click', () => {
       dispatchAction('NEXT_ROUND', { category: state.selectedCategory });
     });
+
+    // 7. PULSANTI ESCI STANZA
+    const leaveButtons = [
+      document.getElementById('btn-leave-room-header'),
+      document.getElementById('btn-leave-room-lobby'),
+      document.getElementById('btn-leave-room-gameplay')
+    ];
+
+    leaveButtons.forEach(btn => {
+      if (btn) {
+        btn.addEventListener('click', leaveRoom);
+      }
+    });
   }
 
   function saveUserName(name) {
@@ -128,6 +141,28 @@
     state.currentRoomCode = code;
     socket.emit('joinRoom', { code, playerId: state.user.id, name: state.user.name });
     UI.updateRoomBadge(code);
+  }
+
+  async function leaveRoom() {
+    if (!state.currentRoomCode) return;
+    const codeToLeave = state.currentRoomCode;
+
+    try {
+      socket.emit('leaveRoom', { code: codeToLeave, playerId: state.user.id });
+
+      await fetch(`/api/rooms/${codeToLeave}/leave`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ playerId: state.user.id })
+      });
+    } catch (err) {
+      console.error('Errore durante l\'uscita dalla stanza:', err.message);
+    } finally {
+      state.currentRoomCode = null;
+      state.session = null;
+      UI.updateRoomBadge(null);
+      UI.switchScreen('screen-home');
+    }
   }
 
   async function dispatchAction(action, payload = {}) {

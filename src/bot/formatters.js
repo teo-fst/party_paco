@@ -9,6 +9,7 @@ function formatWelcomeMessage() {
          `<b>Comandi disponibili:</b>\n` +
          `👉 /newgame - Crea una nuova stanza di gioco\n` +
          `👉 /join [CODICE] - Partecipa ad una stanza esistente (es. /join A7B9X2)\n` +
+         `👉 /leave - Esci dalla stanza attiva\n` +
          `👉 /help - Mostra le istruzioni del bot`;
 }
 

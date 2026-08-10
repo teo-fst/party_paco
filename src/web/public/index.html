@@ -33,6 +33,7 @@
       <div id="room-code-badge" class="room-badge hidden">
         <span class="badge-label">STANZA:</span>
         <span id="display-room-code" class="badge-code">------</span>
+        <button id="btn-leave-room-header" class="btn-leave-icon" title="Esci dalla Stanza">🚪</button>
       </div>
     </header>
 
@@ -108,9 +109,10 @@
             </div>
           </div>
 
-          <!-- Pulsante Avvio Partita -->
-          <div class="lobby-footer">
-            <button id="btn-start-game" class="btn btn-primary btn-large btn-block">🎲 Avvia la Partita</button>
+          <!-- Pulsante Avvio Partita e Esci -->
+          <div class="lobby-footer action-footer-grid">
+            <button id="btn-start-game" class="btn btn-primary btn-large">🎲 Avvia la Partita</button>
+            <button id="btn-leave-room-lobby" class="btn btn-danger btn-large">🚪 Esci Stanza</button>
           </div>
         </div>
       </section>
@@ -159,10 +161,13 @@
             </div>
           </div>
 
-          <!-- Pulsante Prossimo Turno (per Host) -->
-          <div class="game-controls-footer">
-            <button id="btn-next-round" class="btn btn-outline btn-block">➡️ Prossima Frase</button>
+          <!-- Pulsanti Controllo Gioco ed Esci -->
+          <div class="game-controls-footer action-footer-grid">
+            <button id="btn-next-round" class="btn btn-outline">➡️ Prossima Frase</button>
+            <button id="btn-leave-room-gameplay" class="btn btn-danger">🚪 Esci Stanza</button>
           </div>
+        </div>
+      </section> </div>
         </div>
       </section>
 

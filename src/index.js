@@ -114,6 +114,25 @@ app.post('/api/rooms/:code/action', (req, res) => {
   }
 });
 
+// Uscita da una stanza
+app.post('/api/rooms/:code/leave', (req, res) => {
+  try {
+    const { playerId } = req.body;
+    if (!playerId) {
+      return res.status(400).json({ error: "Il campo 'playerId' è obbligatorio." });
+    }
+
+    const { session } = sessionManager.leaveSession(req.params.code, playerId);
+    if (session) {
+      syncManager.broadcastSessionState(session);
+    }
+
+    res.json({ success: true });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 // 4. REAL-TIME SOCKET.IO ENGINE
 syncManager.attachSocketServer(io);
 
@@ -132,6 +151,21 @@ io.on('connection', (socket) => {
         channel: 'web'
       });
       syncManager.broadcastSessionState(session);
+    } catch (err) {
+      socket.emit('error', { message: err.message });
+    }
+  });
+
+  socket.on('leaveRoom', ({ code, playerId }) => {
+    if (!code) return;
+    const cleanCode = code.toUpperCase().trim();
+    socket.leave(`room:${cleanCode}`);
+
+    try {
+      const { session } = sessionManager.leaveSession(cleanCode, playerId);
+      if (session) {
+        syncManager.broadcastSessionState(session);
+      }
     } catch (err) {
       socket.emit('error', { message: err.message });
     }

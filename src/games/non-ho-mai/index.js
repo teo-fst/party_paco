@@ -80,6 +80,9 @@ class NonHoMaiGame extends GameInterface {
             ],
             [
               { text: '⏭️ Prossima Frase', callback_data: `action:NEXT_ROUND:${session.code}` }
+            ],
+            [
+              { text: '🚪 Esci dalla Stanza', callback_data: `leave:${session.code}` }
             ]
           ]
         }
@@ -100,6 +103,9 @@ class NonHoMaiGame extends GameInterface {
           inline_keyboard: [
             [
               { text: '➡️ Prossimo Turno', callback_data: `action:NEXT_ROUND:${session.code}` }
+            ],
+            [
+              { text: '🚪 Esci dalla Stanza', callback_data: `leave:${session.code}` }
             ]
           ]
         }
@@ -114,6 +120,9 @@ class NonHoMaiGame extends GameInterface {
         inline_keyboard: [
           [
             { text: '🎲 Inizia Gioco', callback_data: `action:START_GAME:${session.code}` }
+          ],
+          [
+            { text: '🚪 Esci dalla Stanza', callback_data: `leave:${session.code}` }
           ]
         ]
       }

@@ -172,6 +172,51 @@ class SessionManager {
 
     return { session, events: events || [] };
   }
+
+  /**
+   * Rimuove un giocatore da una sessione esistente.
+   * Se il giocatore è l'host, assegna il ruolo di host al prossimo partecipante.
+   * Se la stanza rimane vuota, la chiude/rimuove.
+   * 
+   * @param {string} code Codice stanza
+   * @param {string} playerId ID del giocatore uscente
+   * @returns {{ session: Object|null, removedPlayer: Object }}
+   */
+  leaveSession(code, playerId) {
+    const session = this.getSession(code);
+    if (!session) {
+      throw new Error(`Stanza non trovata con il codice: ${code}`);
+    }
+
+    const playerIndex = session.players.findIndex(p => p.id === playerId);
+    if (playerIndex === -1) {
+      return { session, removedPlayer: null };
+    }
+
+    const [removedPlayer] = session.players.splice(playerIndex, 1);
+
+    // Se la stanza è vuota, chiudila
+    if (session.players.length === 0) {
+      session.status = 'FINISHED';
+      this.sessions.delete(session.code);
+      database.saveSession(session);
+      console.log(`[SessionManager] Stanza [${code}] chiusa (tutti i giocatori sono usciti).`);
+      return { session: null, removedPlayer };
+    }
+
+    // Se l'utente uscente era l'host, trasferisci il ruolo al primo partecipante rimanente
+    if (removedPlayer.isHost) {
+      session.players[0].isHost = true;
+      session.hostId = session.players[0].id;
+      console.log(`[SessionManager] Nuovo host per la stanza [${code}]: ${session.players[0].name}`);
+    }
+
+    session.updatedAt = Date.now();
+    database.saveSession(session);
+    console.log(`[SessionManager] Giocatore "${removedPlayer.name}" ha lasciato la stanza [${code}]`);
+
+    return { session, removedPlayer };
+  }
 }
 
 module.exports = new SessionManager();

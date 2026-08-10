@@ -91,6 +91,35 @@ class TelegramBotAdapter {
 
         // Sincronizza ed invia la vista di gioco
         syncManager.broadcastSessionState(session);
+    // Comando /leave <code?>
+    this.bot.onText(/\/leave(?:\s+(\w+))?/, (msg, match) => {
+      const chatId = msg.chat.id;
+      const playerId = `tg_${msg.from.id}`;
+      const inputCode = match[1] ? match[1].trim().toUpperCase() : null;
+
+      // Trova la stanza attiva dell'utente se il codice non è specificato
+      let targetCode = inputCode;
+      if (!targetCode) {
+        for (const [key, msgId] of this.activeMessages.entries()) {
+          if (key.startsWith(`${chatId}_`)) {
+            targetCode = key.split('_')[1];
+            break;
+          }
+        }
+      }
+
+      if (!targetCode) {
+        return this.bot.sendMessage(chatId, "⚠️ Non risulti in nessuna stanza attiva o non hai specificato il codice.");
+      }
+
+      try {
+        const { session } = sessionManager.leaveSession(targetCode, playerId);
+        this.activeMessages.delete(`${chatId}_${targetCode}`);
+        this.bot.sendMessage(chatId, `🚪 Sei uscito dalla stanza <b>${targetCode}</b>.`, { parse_mode: 'HTML' });
+
+        if (session) {
+          syncManager.broadcastSessionState(session);
+        }
       } catch (err) {
         this.bot.sendMessage(chatId, `❌ ${err.message}`);
       }
@@ -122,6 +151,19 @@ class TelegramBotAdapter {
 
           this.activeMessages.set(`${chatId}_${session.code}`, sentMsg.message_id);
           syncManager.broadcastSessionState(session);
+        } else if (data.startsWith('leave:')) {
+          const code = data.split(':')[1];
+          const playerId = `tg_${query.from.id}`;
+
+          const { session } = sessionManager.leaveSession(code, playerId);
+          this.activeMessages.delete(`${chatId}_${code}`);
+
+          await this.bot.answerCallbackQuery(query.id, { text: `Sei uscito dalla stanza ${code}` });
+          await this.bot.sendMessage(chatId, `🚪 Sei uscito dalla stanza <b>${code}</b>.`, { parse_mode: 'HTML' });
+
+          if (session) {
+            syncManager.broadcastSessionState(session);
+          }
         } else if (data.startsWith('vote:')) {
           // Formato: vote:VALUE:CODE (es. vote:DONE:A7B9X2)
           const [, voteValue, code] = data.split(':');
