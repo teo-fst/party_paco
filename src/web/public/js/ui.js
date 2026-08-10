@@ -6,6 +6,12 @@
 window.PartyPacoUI = {
   activeScreen: 'screen-home',
 
+  gameLabels: {
+    'non-ho-mai': 'Non Ho Mai',
+    impostore: 'Impostore',
+    'obbligo-o-verita': 'Obbligo o Verità'
+  },
+
   /**
    * Cambia la schermata attiva con una transizione fluida.
    * @param {string} screenId 'screen-home', 'screen-lobby', 'screen-gameplay'
@@ -64,6 +70,57 @@ window.PartyPacoUI = {
     });
   },
 
+  getGameLabel(gameId) {
+    return this.gameLabels[gameId] || 'Partita';
+  },
+
+  renderLobbyForGame(session) {
+    const titleEl = document.getElementById('lobby-game-title');
+    const categoryContainer = document.getElementById('category-selector-container');
+    const customPhraseSection = document.getElementById('custom-phrase-section');
+    const gameId = session?.gameId || 'non-ho-mai';
+    const label = this.getGameLabel(gameId);
+
+    if (titleEl) titleEl.textContent = label;
+
+    const shouldShowCategoryUi = gameId === 'non-ho-mai';
+    if (categoryContainer) categoryContainer.style.display = shouldShowCategoryUi ? 'block' : 'none';
+    if (customPhraseSection) customPhraseSection.style.display = shouldShowCategoryUi ? 'block' : 'none';
+  },
+
+  renderGameplayForGame(session, currentUserId) {
+    const gameId = session?.gameId || 'non-ho-mai';
+    if (gameId === 'non-ho-mai') {
+      this.renderNonHoMaiGameplay(session.gameState, session.players, currentUserId);
+      return;
+    }
+
+    this.renderGenericGameplay(session, gameId);
+  },
+
+  renderGenericGameplay(session, gameId) {
+    const state = session?.gameState || {};
+    const phraseEl = document.getElementById('phrase-text');
+    const roundEl = document.getElementById('game-round-num');
+    const categoryBadgeEl = document.getElementById('game-category-badge');
+    const voteControls = document.getElementById('voting-controls');
+    const voteProgressCounter = document.getElementById('vote-progress-counter');
+    const voteProgressBar = document.getElementById('vote-progress-bar');
+    const liveVotesList = document.getElementById('live-votes-list');
+
+    const label = this.getGameLabel(gameId);
+    roundEl.textContent = state.round || state.roundNumber || 1;
+    categoryBadgeEl.textContent = label;
+
+    const promptText = state.currentPrompt?.text || state.currentPhrase?.text || `Partita in corso: ${label}`;
+    phraseEl.textContent = state.currentPrompt ? promptText : `"${promptText}"`;
+
+    if (voteControls) voteControls.style.display = 'none';
+    if (voteProgressCounter) voteProgressCounter.textContent = 'N/A';
+    if (voteProgressBar) voteProgressBar.style.width = '0%';
+    if (liveVotesList) liveVotesList.innerHTML = '<div class="vote-chip"><span>Gioco attivo</span><strong>In corso</strong></div>';
+  },
+
   /**
    * Renderizza la vista del gioco "Non Ho Mai".
    */
@@ -74,6 +131,9 @@ window.PartyPacoUI = {
     const voteProgressCounter = document.getElementById('vote-progress-counter');
     const voteProgressBar = document.getElementById('vote-progress-bar');
     const liveVotesList = document.getElementById('live-votes-list');
+    const voteControls = document.getElementById('voting-controls');
+
+    if (voteControls) voteControls.style.display = 'block';
 
     roundEl.textContent = state.roundNumber || 1;
     categoryBadgeEl.textContent = state.selectedCategory || 'Classico';

@@ -259,11 +259,12 @@
 
       if (session.status === 'WAITING') {
         UI.switchScreen('screen-lobby');
+        UI.renderLobbyForGame(session);
         UI.renderPlayers(session.players, state.user.id);
       } else if (session.status === 'PLAYING') {
         UI.switchScreen('screen-gameplay');
         UI.renderPlayers(session.players, state.user.id);
-        UI.renderNonHoMaiGameplay(session.gameState, session.players, state.user.id);
+        UI.renderGameplayForGame(session, state.user.id);
       }
     });
   }
