@@ -106,6 +106,16 @@ class Database {
       return null;
     }
   }
+
+  deleteSession(code) {
+    if (!this.db || !code) return;
+    try {
+      const stmt = this.db.prepare('DELETE FROM sessions WHERE code = ?');
+      stmt.run(code);
+    } catch (err) {
+      console.error('[Database] Errore durante deleteSession:', err.message);
+    }
+  }
 }
 
 module.exports = new Database();

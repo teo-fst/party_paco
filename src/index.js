@@ -150,6 +150,7 @@ io.on('connection', (socket) => {
         name: name || 'Giocatore Web',
         channel: 'web'
       });
+      sessionManager.registerSocketForPlayer(cleanCode, playerId, socket.id);
       syncManager.broadcastSessionState(session);
     } catch (err) {
       socket.emit('error', { message: err.message });
@@ -160,6 +161,7 @@ io.on('connection', (socket) => {
     if (!code) return;
     const cleanCode = code.toUpperCase().trim();
     socket.leave(`room:${cleanCode}`);
+    sessionManager.unregisterSocket(socket.id);
 
     try {
       const { session } = sessionManager.leaveSession(cleanCode, playerId);
@@ -173,6 +175,10 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     console.log(`[Socket] Client disconnesso (ID: ${socket.id})`);
+    const { session } = sessionManager.handleSocketDisconnect(socket.id);
+    if (session) {
+      syncManager.broadcastSessionState(session);
+    }
   });
 });
 

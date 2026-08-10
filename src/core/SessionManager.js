@@ -14,6 +14,8 @@ class SessionManager {
   constructor() {
     // Map { code: sessionObject }
     this.sessions = new Map();
+    // Map { socketId: { code, playerId } }
+    this.socketPlayers = new Map();
   }
 
   /**
@@ -86,7 +88,7 @@ class SessionManager {
   getSession(code) {
     if (!code) return null;
     const cleanCode = code.toUpperCase().trim();
-    
+
     if (this.sessions.has(cleanCode)) {
       return this.sessions.get(cleanCode);
     }
@@ -173,6 +175,33 @@ class SessionManager {
     return { session, events: events || [] };
   }
 
+  registerSocketForPlayer(code, playerId, socketId) {
+    if (!code || !playerId || !socketId) return;
+    this.socketPlayers.set(socketId, { code: code.toUpperCase().trim(), playerId });
+  }
+
+  unregisterSocket(socketId) {
+    if (!socketId) return null;
+    const socketSession = this.socketPlayers.get(socketId);
+    this.socketPlayers.delete(socketId);
+    return socketSession || null;
+  }
+
+  closeEmptySession(code) {
+    const session = this.getSession(code);
+    if (!session) return null;
+
+    if (session.players.length === 0) {
+      session.status = 'FINISHED';
+      this.sessions.delete(session.code);
+      database.deleteSession(session.code);
+      console.log(`[SessionManager] Stanza [${code}] chiusa (nessun giocatore connesso).`);
+      return null;
+    }
+
+    return session;
+  }
+
   /**
    * Rimuove un giocatore da una sessione esistente.
    * Se il giocatore è l'host, assegna il ruolo di host al prossimo partecipante.
@@ -199,7 +228,7 @@ class SessionManager {
     if (session.players.length === 0) {
       session.status = 'FINISHED';
       this.sessions.delete(session.code);
-      database.saveSession(session);
+      database.deleteSession(session.code);
       console.log(`[SessionManager] Stanza [${code}] chiusa (tutti i giocatori sono usciti).`);
       return { session: null, removedPlayer };
     }
@@ -215,6 +244,42 @@ class SessionManager {
     database.saveSession(session);
     console.log(`[SessionManager] Giocatore "${removedPlayer.name}" ha lasciato la stanza [${code}]`);
 
+    return { session, removedPlayer };
+  }
+
+  handleSocketDisconnect(socketId) {
+    const socketSession = this.unregisterSocket(socketId);
+    if (!socketSession) return { session: null, removedPlayer: null };
+
+    const session = this.getSession(socketSession.code);
+    if (!session) {
+      return { session: null, removedPlayer: null };
+    }
+
+    const playerIndex = session.players.findIndex(p => p.id === socketSession.playerId);
+    if (playerIndex === -1) {
+      return { session, removedPlayer: null };
+    }
+
+    const [removedPlayer] = session.players.splice(playerIndex, 1);
+
+    if (session.players.length === 0) {
+      session.status = 'FINISHED';
+      this.sessions.delete(session.code);
+      database.deleteSession(session.code);
+      console.log(`[SessionManager] Stanza [${session.code}] chiusa (socket disconnesso e nessun giocatore rimasto).`);
+      return { session: null, removedPlayer };
+    }
+
+    if (removedPlayer.isHost) {
+      session.players[0].isHost = true;
+      session.hostId = session.players[0].id;
+      console.log(`[SessionManager] Nuovo host per la stanza [${session.code}]: ${session.players[0].name}`);
+    }
+
+    session.updatedAt = Date.now();
+    database.saveSession(session);
+    console.log(`[SessionManager] Giocatore "${removedPlayer.name}" disconnesso dalla stanza [${session.code}]`);
     return { session, removedPlayer };
   }
 }
