@@ -110,7 +110,7 @@ Modifica il file `.env` aggiungendo il tuo **Telegram Bot Token** fornito da `@B
 
 ```env
 PORT=6767
-TELEGRAM_BOT_TOKEN=123456789:ABCdefGhIJKlmNoPQRstuVWXyz
+TELEGRAM_BOT_TOKEN=your_token_bot
 TELEGRAM_ENABLED=true
 ```
 
