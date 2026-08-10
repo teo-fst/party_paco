@@ -25,22 +25,6 @@ services:
       retries: 3
       start_period: 5s
 
-  party-paco-test:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: party-paco-test
-    environment:
-      - PORT=6767
-      - NODE_ENV=test
-      - DATA_DIR=/app/data
-      - DB_PATH=/app/data/party_paco.db
-    volumes:
-      - .:/app
-      - /app/node_modules
-      - party_paco_data:/app/data
-    command: ["node", "--test", "tests/*.test.js"]
-
 volumes:
   party_paco_data:
     driver: local
