@@ -49,7 +49,6 @@ class TelegramBotAdapter {
     // Comando /newgame
     this.bot.onText(/\/newgame/, (msg) => {
       const chatId = msg.chat.id;
-      const userName = msg.from.first_name || 'Utente Telegram';
 
       const games = gameRegistry.listGames();
       if (games.length === 0) {
@@ -91,6 +90,11 @@ class TelegramBotAdapter {
 
         // Sincronizza ed invia la vista di gioco
         syncManager.broadcastSessionState(session);
+      } catch (err) {
+        this.bot.sendMessage(chatId, `❌ ${err.message}`);
+      }
+    });
+
     // Comando /leave <code?>
     this.bot.onText(/\/leave(?:\s+(\w+))?/, (msg, match) => {
       const chatId = msg.chat.id;
@@ -100,7 +104,7 @@ class TelegramBotAdapter {
       // Trova la stanza attiva dell'utente se il codice non è specificato
       let targetCode = inputCode;
       if (!targetCode) {
-        for (const [key, msgId] of this.activeMessages.entries()) {
+        for (const [key] of this.activeMessages.entries()) {
           if (key.startsWith(`${chatId}_`)) {
             targetCode = key.split('_')[1];
             break;
