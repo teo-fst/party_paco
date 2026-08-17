@@ -20,5 +20,4 @@ ENV NODE_ENV=production
 COPY package*.json ./
 RUN npm install --omit=dev
 COPY --from=builder /app/src ./src
-COPY --from=builder /app/data ./data
 CMD ["node", "src/index.js"]
