@@ -19,5 +19,6 @@ WORKDIR /app
 ENV NODE_ENV=production
 COPY package*.json ./
 RUN npm install --omit=dev
-COPY --from=builder /app/src ./src
+# Sostituisci la riga 22 del precedente Dockerfile con questa:
+COPY --from=builder /app/src /app/src
 CMD ["node", "src/index.js"]
