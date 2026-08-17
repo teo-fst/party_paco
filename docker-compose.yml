@@ -9,7 +9,7 @@ services:
       - "6767:6767"
     environment:
       - NODE_ENV=${NODE_ENV:-development}
-      - PORT=3000
+      - PORT=6767
       - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
       - DB_PATH=/app/data/party_paco.db
       - LOG_LEVEL=${LOG_LEVEL:-info}
