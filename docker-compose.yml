@@ -6,7 +6,7 @@ services:
     container_name: party_paco_app
     restart: unless-stopped
     ports:
-      - "3000:3000"
+      - "6767:6767"
     environment:
       - NODE_ENV=${NODE_ENV:-development}
       - PORT=3000
