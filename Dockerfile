@@ -1,6 +1,7 @@
 FROM node:20-alpine AS base
 WORKDIR /app
-RUN apk add --no-dependencies --no-cache python3 make g++
+# Installazione corretta dei tool di compilazione nativa per better-sqlite3
+RUN apk add --no-cache python3 make g++ build-base
 
 FROM base AS development
 ENV NODE_ENV=development
