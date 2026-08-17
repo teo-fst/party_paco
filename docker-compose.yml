@@ -1,0 +1,26 @@
+services:
+  app:
+    build:
+      context: .
+      target: ${NODE_ENV:-development}
+    container_name: party_paco_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=${NODE_ENV:-development}
+      - PORT=3000
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - DB_PATH=/app/data/party_paco.db
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+    volumes:
+      # Sfrutta il filesystem ad alte prestazioni dell'SSD NVMe sul Pi 5
+      - .:/app
+      - /app/node_modules
+      - ./data:/app/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/sessions || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
