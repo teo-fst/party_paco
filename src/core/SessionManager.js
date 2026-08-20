@@ -3,7 +3,7 @@ const logger = require('../utils/logger');
 
 class SessionManager {
   constructor() {
-    this.sessions = new Map(); // In-Memory store
+    this.sessions = new Map();
     this.restoreFromDb();
   }
 
@@ -26,7 +26,9 @@ class SessionManager {
       gameType,
       status: 'WAITING',
       players: new Map(),
-      gameState: null
+      gameState: null,
+      createdAt: Date.now(),
+      lastActivity: Date.now()
     };
 
     this.sessions.set(code, session);
@@ -39,7 +41,12 @@ class SessionManager {
   }
 
   getSession(code) {
-    return this.sessions.get(code.toUpperCase());
+    if (!code) return null;
+    const session = this.sessions.get(code.toUpperCase());
+    if (session) {
+      session.lastActivity = Date.now();
+    }
+    return session;
   }
 
   addPlayer(code, telegramId, username) {
@@ -50,6 +57,7 @@ class SessionManager {
     const player = { id: playerId, telegramId, username, score: 0 };
 
     session.players.set(playerId, player);
+    session.lastActivity = Date.now();
 
     const stmt = db.prepare(`
       INSERT INTO players (id, session_code, username, telegram_id, score)
@@ -79,13 +87,28 @@ class SessionManager {
     this.sessions.delete(code);
     db.prepare('DELETE FROM sessions WHERE code = ?').run(code);
     db.prepare('DELETE FROM game_states WHERE session_code = ?').run(code);
-    logger.info({ code }, 'Sessione eliminata per assenza di giocatori');
+    db.prepare('DELETE FROM players WHERE session_code = ?').run(code);
+    logger.info({ code }, 'Sessione eliminata per inattività o assenza di giocatori');
+  }
+
+  // Pulisce le stanze abbandonate o inattive
+  cleanInactiveSessions(maxInactivityMs = 600000) { // 10 minuti
+    const now = Date.now();
+    for (const [code, session] of this.sessions.entries()) {
+      const isExpired = (now - session.lastActivity) > maxInactivityMs;
+      const isEmpty = session.players.size === 0;
+
+      if (isEmpty || isExpired) {
+        this.deleteSession(code);
+      }
+    }
   }
 
   persistState(code, state) {
     const session = this.getSession(code);
     if (session) {
       session.gameState = state;
+      session.lastActivity = Date.now();
       const json = JSON.stringify(state);
       db.prepare(`
         INSERT INTO game_states (session_code, state_json) VALUES (?, ?)
@@ -96,9 +119,21 @@ class SessionManager {
 
   restoreFromDb() {
     try {
+      db.prepare(`
+        DELETE FROM sessions 
+        WHERE code NOT IN (SELECT DISTINCT session_code FROM players)
+      `).run();
+
       const activeSessions = db.prepare("SELECT * FROM sessions WHERE status != 'FINISHED'").all();
+
       for (const row of activeSessions) {
         const players = db.prepare("SELECT * FROM players WHERE session_code = ?").all(row.code);
+
+        if (!players || players.length === 0) {
+          this.deleteSession(row.code);
+          continue;
+        }
+
         const stateRow = db.prepare("SELECT state_json FROM game_states WHERE session_code = ?").get(row.code);
 
         const playerMap = new Map();
@@ -109,10 +144,12 @@ class SessionManager {
           gameType: row.game_type,
           status: row.status,
           players: playerMap,
-          gameState: stateRow ? JSON.parse(stateRow.state_json) : null
+          gameState: stateRow ? JSON.parse(stateRow.state_json) : null,
+          createdAt: Date.now(),
+          lastActivity: Date.now()
         });
       }
-      logger.info({ count: activeSessions.length }, '[Probabile] Stato sessioni ripristinato dal DB');
+      logger.info({ count: this.sessions.size }, 'Stato sessioni ripristinato dal DB');
     } catch (err) {
       logger.error(err, 'Errore durante il ripristino sessioni da DB');
     }

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Party Paco - Obbligo o Verità</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .roulette-box {
+      font-size: 1.5rem;
+      font-weight: 800;
+      padding: 18px;
+      margin: 15px 0;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 2px dashed var(--accent-cyan);
+      text-align: center;
+    }
+    .choice-badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 99px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      background: rgba(0, 242, 254, 0.15);
+      border: 1px solid var(--accent-cyan);
+      color: #fff;
+    }
+    .choice-container {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .input-full-container {
+      width: 100%;
+      box-sizing: border-box;
+      margin-bottom: 12px;
+    }
+    .input-full-container input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 14px 16px;
+      font-size: 1rem;
+    }
+    .preset-btns {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .prompt-card {
+      background: rgba(0, 242, 254, 0.1);
+      border: 1px solid var(--accent-cyan);
+      border-radius: 12px;
+      padding: 20px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      margin: 15px 0;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <main class="container">
+    <section class="session-view glass-card" style="display: flex;">
+      <div class="room-header">
+        <p class="text-muted">Stanza Obbligo o Verità</p>
+        <div id="display-room-code" class="room-code-badge">------</div>
+        <div id="players-list" class="players-list"></div>
+      </div>
+
+      <!-- Schermata di attesa e Avvio Partita per l'Host -->
+      <div id="lobby-waiting" style="text-align: center; margin: 20px 0; display: none;">
+        <p id="waiting-status-text" class="text-muted">In attesa dei giocatori...</p>
+        <button id="btn-start-game" class="btn btn-primary" style="display: none; margin-top: 15px;" onclick="startGame()">🚀 Avvia Partita</button>
+      </div>
+
+      <!-- Scatola estrazione turni -->
+      <div id="roulette" class="roulette-box" style="display: none;">🎲 Preparazione...</div>
+
+      <!-- Banner Scelta effettuata -->
+      <div id="choice-banner" style="text-align: center; display: none;">
+        <span id="choice-badge-text" class="choice-badge">---</span>
+      </div>
+
+      <!-- Fase 1: Scelta Tipo (Per il bersaglio) -->
+      <div id="phase-choosing" style="display: none;">
+        <p class="text-muted" style="text-align: center;">Tocca a te! Scegli la tua sorte:</p>
+        <div class="choice-container">
+          <button class="btn btn-primary" onclick="selectType('truth')">🤔 VERITÀ</button>
+          <button class="btn btn-secondary" onclick="selectType('dare')">🔥 OBBLIGO</button>
+        </div>
+      </div>
+
+      <!-- Fase 2: Creazione/Generazione Sfida (Per chi fa la domanda) -->
+      <div id="phase-prompting" style="display: none;">
+        <div class="input-full-container">
+          <input type="text" id="custom-prompt-input" class="input-glass" placeholder="Scrivi una sfida o domanda personalizzata...">
+        </div>
+        <button class="btn btn-primary" style="width: 100%;" onclick="submitCustomPrompt()">Invia Sfida Personalizzata</button>
+
+        <p style="margin-top: 20px; font-size: 0.85rem; text-align: center;" class="text-muted">Oppure scegli una categoria dal gioco:</p>
+        <div id="preset-categories-container" class="preset-btns"></div>
+      </div>
+
+      <!-- Fase 3: Esecuzione dell'obbligo o della verità -->
+      <div id="phase-answering" style="display: none; text-align: center;">
+        <div id="display-prompt" class="prompt-card">---</div>
+        <button id="btn-complete" class="btn btn-primary" style="display: none;" onclick="completeTurn()">✅ Completato! Prossimo Turno</button>
+      </div>
+
+      <!-- Azioni Generali -->
+      <div class="actions-footer">
+        <button class="btn btn-secondary" onclick="window.location.href='/'">Esci alla Lobby</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/truthordare.js"></script>
+</body>
+</html>

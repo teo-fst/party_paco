@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Party Paco - Minimal Glass Edition</title>
+  
+  <!-- Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Style CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Elementi Sfondo (Liquid Glass Blobs) -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <main class="container">
+    <!-- Header -->
+    <header class="glass-card">
+      <div class="logo-group">
+        <h1>Party Paco</h1>
+        <p>Minigames Hub & Local Platform</p>
+      </div>
+      <div class="status-badge">
+        <span class="dot"></span> Server Online
+      </div>
+    </header>
+
+    <!-- Selezione Gioco -->
+    <section>
+      <div class="section-title">
+        <span>🎮</span> Scegli un Minigioco
+      </div>
+      <div class="games-grid">
+        <div class="game-card glass-card active" data-game="tictactoe" onclick="selectGame('tictactoe', this)">
+          <div class="game-icon">❌⭕</div>
+          <h3>Tris (TicTacToe)</h3>
+          <p>Sfida a griglia 3x3 per 2 giocatori. Semplice e veloce.</p>
+          <span class="tag tag-ready">Pronto</span>
+        </div>
+
+        <div class="game-card glass-card" data-game="truthordare" onclick="selectGame('truthordare', this)">
+          <div class="game-icon">🔥🤔</div>
+          <h3>Obbligo o Verità</h3>
+          <p>Sfide e domande di gruppo con suggerimenti e categorie.</p>
+          <span class="tag tag-ready">Pronto</span>
+        </div>
+
+        <div class="game-card glass-card disabled">
+          <div class="game-icon">🧠</div>
+          <h3>Quiz & Trivia</h3>
+          <p>Rispondi alle domande e scala la classifica della stanza.</p>
+          <span class="tag tag-soon">In Arrivo</span>
+        </div>
+
+        <div class="game-card glass-card disabled">
+          <div class="game-icon">🟡</div>
+          <h3>Forza 4</h3>
+          <p>Allinea 4 gettoni del tuo colore prima del tuo avversario.</p>
+          <span class="tag tag-soon">In Arrivo</span>
+        </div>
+
+        <div class="game-card glass-card disabled">
+          <div class="game-icon">🚢</div>
+          <h3>Battaglia Navale</h3>
+          <p>Posiziona le navi ed affonda la flotta nemica.</p>
+          <span class="tag tag-soon">In Arrivo</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Pannello Creazione / Accesso Diretto -->
+    <section class="actions-panel glass-card">
+      <div style="width: 100%; margin-bottom: 10px;">
+        <input type="text" id="username-input" class="input-glass" placeholder="IL TUO NICKNAME" maxlength="12" style="width: 100%;" oninput="toggleButtons()">
+      </div>
+
+      <button id="btn-create" class="btn btn-primary" onclick="createRoom()" disabled>
+        <span>✨</span> Crea Nuova Stanza
+      </button>
+
+      <div class="join-group">
+        <input type="text" id="join-code" class="input-glass" placeholder="CODICE STAZ." maxlength="6">
+        <button id="btn-join" class="btn btn-secondary" onclick="joinRoom()" disabled>Entra</button>
+      </div>
+    </section>
+
+    <!-- Lista Stanze Pubbliche Disponibili -->
+    <section class="public-rooms-section glass-card">
+        <div class="public-rooms-header">
+            <div class="section-title" style="margin: 0;">
+            <span>🌐</span> Stanze Disponibili
+            </div>
+            <button class="btn btn-secondary" style="padding: 8px 16px; font-size: 0.85rem;" onclick="loadPublicRooms()">
+            🔄 Aggiorna
+            </button>
+        </div>
+
+        <div id="rooms-list-container" class="rooms-list">
+            <div class="room-empty-state">Caricamento stanze disponibili...</div>
+        </div>
+    </section>
+    
+  </main>
+
+  <!-- Script JS -->
+  <script src="js/app.js"></script>
+</body>
+</html>

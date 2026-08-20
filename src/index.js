@@ -3,18 +3,15 @@ const express = require('express');
 const logger = require('./utils/logger');
 const errorHandler = require('./api/middlewares/errorHandler');
 const sessionsRouter = require('./api/routes/sessions');
-const setupBot = require('./bot');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use(express.static('public'));
 
 // Routes
 app.use('/api/sessions', sessionsRouter);
-
-// Global Error Handler
-app.use(errorHandler);
 
 app.get('/', (req, res) => {
   res.status(200).json({
@@ -26,8 +23,23 @@ app.get('/', (req, res) => {
   });
 });
 
-// Server Init
-app.listen(PORT, '0.0.0.0', () => {
-  logger.info(`[Certo] API Server party_paco in ascolto sulla porta ${PORT}`);
-  setupBot();
+// Global Error Handler
+app.use(errorHandler);
+
+// Bot Telegram temporaneamente DISATTIVATO
+/*
+const setupBot = require('./bot');
+try {
+  const bot = setupBot();
+  if (bot && typeof bot.launch === 'function') {
+    bot.launch({ dropPendingUpdates: true });
+  }
+} catch (err) {
+  console.error('Errore bot:', err.message);
+}
+*/
+
+// Avvio Server Express
+app.listen(PORT, () => {
+  console.log(`🚀 Server Party Paco attivo su http://localhost:${PORT}`);
 });

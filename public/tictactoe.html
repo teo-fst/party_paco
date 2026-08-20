@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Party Paco - Tris</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+
+  <main class="container">
+    <section class="session-view glass-card" style="display: flex;">
+      <div class="room-header">
+        <p class="text-muted">Stanza Corrente</p>
+        <div id="display-room-code" class="room-code-badge">------</div>
+        
+        <!-- Lista Giocatori In Alto -->
+        <div id="players-list" class="players-list"></div>
+      </div>
+
+      <div id="game-status" class="game-status">In attesa del secondo giocatore...</div>
+
+      <div id="tictactoe-board" class="tictactoe-board">
+        <div class="cell" onclick="makeMove(0)"></div>
+        <div class="cell" onclick="makeMove(1)"></div>
+        <div class="cell" onclick="makeMove(2)"></div>
+        <div class="cell" onclick="makeMove(3)"></div>
+        <div class="cell" onclick="makeMove(4)"></div>
+        <div class="cell" onclick="makeMove(5)"></div>
+        <div class="cell" onclick="makeMove(6)"></div>
+        <div class="cell" onclick="makeMove(7)"></div>
+        <div class="cell" onclick="makeMove(8)"></div>
+      </div>
+
+      <!-- Unico Blocco Azioni -->
+      <div class="actions-footer">
+        <button id="restart-btn" class="btn btn-primary" style="display: none;" onclick="restartGame()">⚡ Rigioca</button>
+        <button class="btn btn-secondary" onclick="window.location.href='/'">Esci alla Lobby</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="js/tictactoe.js"></script>
+</body>
+</html>
